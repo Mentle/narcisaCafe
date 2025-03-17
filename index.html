@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Narcisa Mimosa Coffee Shop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.17/paper-full.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Welcome Screen -->
+        <section id="welcome-screen" class="screen active">
+            <div class="logo-container">
+                <img src="assets/logo.png" alt="Narcisa Mimosa Logo" id="logo">
+            </div>
+            <h1>Welcome to Narcisa Mimosa</h1>
+            <button id="begin-order-btn" class="primary-btn">Begin Order</button>
+        </section>
+
+        <!-- Identity Confirmation Screen -->
+        <section id="identity-screen" class="screen">
+            <h2>Let's Get to Know You</h2>
+            <div class="camera-container">
+                <video id="camera-preview" autoplay playsinline></video>
+                <canvas id="photo-canvas" style="display: none;"></canvas>
+                <img id="captured-photo" style="display: none;">
+            </div>
+            <div class="camera-controls">
+                <button id="take-photo-btn" class="primary-btn">Take Photo</button>
+                <button id="retake-photo-btn" class="secondary-btn" style="display: none;">Retake</button>
+            </div>
+            <div id="photo-confirmation" style="display: none;">
+                <p>Just making sure we know who to call when your coffee is ready! Look good?</p>
+                <div class="name-input">
+                    <label for="customer-name">Your Name:</label>
+                    <input type="text" id="customer-name" placeholder="Enter your name">
+                </div>
+                <button id="confirm-identity-btn" class="primary-btn">Confirm & Continue</button>
+            </div>
+        </section>
+
+        <!-- Order Selection Screen -->
+        <section id="order-screen" class="screen">
+            <div class="header">
+                <div class="customer-info">
+                    <img id="customer-photo-small" class="customer-photo-small" alt="Customer Photo">
+                    <h2>Welcome, <span id="customer-name-display"></span>!</h2>
+                </div>
+                <div class="cart-icon-container">
+                    <div class="cart-icon" id="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-counter" id="cart-counter">0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Menu Navigation Tabs -->
+            <div class="menu-tabs">
+                <button class="tab-btn active" data-tab="coffee-section">Coffee</button>
+                <button class="tab-btn" data-tab="pastry-section">Pastries</button>
+            </div>
+            
+            <div class="menu-container">
+                <div id="coffee-section" class="menu-section tab-content active">
+                    <h3>Coffee</h3>
+                    <div class="coffee-grid">
+                        <div class="menu-item" data-item="Espresso" data-type="coffee" data-price="2.50">
+                            <img src="assets/espresso.jpg" alt="Espresso">
+                            <div class="menu-item-details">
+                                <h4>Espresso</h4>
+                                <p class="price">€2.50</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Cappuccino" data-type="coffee" data-price="3.50">
+                            <img src="assets/cappuccino.jpg" alt="Cappuccino">
+                            <div class="menu-item-details">
+                                <h4>Cappuccino</h4>
+                                <p class="price">€3.50</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Latte" data-type="coffee" data-price="3.80">
+                            <img src="assets/latte.jpg" alt="Latte">
+                            <div class="menu-item-details">
+                                <h4>Latte</h4>
+                                <p class="price">€3.80</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Americano" data-type="coffee" data-price="3.00">
+                            <img src="assets/americano.jpg" alt="Americano">
+                            <div class="menu-item-details">
+                                <h4>Americano</h4>
+                                <p class="price">€3.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="pastry-section" class="menu-section tab-content">
+                    <h3>Pastries</h3>
+                    <div class="pastry-grid">
+                        <div class="menu-item" data-item="Croissant de Almendra" data-type="pastry" data-price="2.80">
+                            <img src="assets/croissant.jpg" alt="Croissant de Almendra">
+                            <div class="menu-item-details">
+                                <h4>Croissant de Almendra</h4>
+                                <p class="price">€2.80</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Cinnamon Roll" data-type="pastry" data-price="3.20">
+                            <img src="assets/cinnamon-roll.jpg" alt="Cinnamon Roll">
+                            <div class="menu-item-details">
+                                <h4>Cinnamon Roll</h4>
+                                <p class="price">€3.20</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="coffee-customization" class="customization-panel">
+                <div class="customization-header">
+                    <h3>Customize Your <span id="selected-coffee-name">Coffee</span></h3>
+                    <button id="back-to-menu-btn" class="secondary-btn">Back to Menu</button>
+                </div>
+                
+                <div class="customization-section">
+                    <h4>Milk Options</h4>
+                    <div class="options-grid">
+                        <div class="option-item" data-option="Soy Milk">
+                            <span>Soy</span>
+                        </div>
+                        <div class="option-item" data-option="Almond Milk">
+                            <span>Almond</span>
+                        </div>
+                        <div class="option-item" data-option="Oat Milk">
+                            <span>Oat</span>
+                        </div>
+                        <div class="option-item" data-option="Normal Milk">
+                            <span>Normal</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="customization-section">
+                    <h4>Extras</h4>
+                    <div class="options-grid">
+                        <div class="option-item" data-option="Brown Sugar">
+                            <span>Brown Sugar</span>
+                        </div>
+                        <div class="option-item" data-option="Honey">
+                            <span>Honey</span>
+                        </div>
+                        <div class="option-item" data-option="Cinnamon">
+                            <span>Cinnamon</span>
+                        </div>
+                        <div class="option-item" data-option="Cacao">
+                            <span>Cacao</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="customization-actions">
+                    <button id="add-to-cart-btn" class="primary-btn">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cart Modal -->
+        <div id="cart-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Your Cart</h3>
+                    <span class="close-modal">&times;</span>
+                </div>
+                <div id="cart-items"></div>
+                <div class="cart-total">
+                    <p>Total: <span id="cart-total">€0.00</span></p>
+                </div>
+                <button id="checkout-btn" class="primary-btn" disabled>Proceed to Checkout</button>
+            </div>
+        </div>
+
+        <!-- Checkout Screen -->
+        <section id="checkout-screen" class="screen">
+            <h2>Almost There!</h2>
+            <div class="checkout-summary">
+                <h3>Order Summary</h3>
+                <div id="checkout-items"></div>
+                <div class="checkout-total">
+                    <p>Total: <span id="checkout-total">€0.00</span></p>
+                </div>
+            </div>
+            <button id="add-tip-btn" class="primary-btn">Add Tip</button>
+            <div id="tip-container" style="display: none;">
+                <div class="tip-message">
+                    <p>The real tip is a kind word or a doodle! Leave us a little love below!</p>
+                </div>
+                <div class="drawing-container">
+                    <div class="drawing-instructions">
+                        Use your finger to draw a message or doodle below
+                    </div>
+                    <div class="color-options">
+                        <div class="color-option selected" data-color="#000000"></div>
+                        <div class="color-option" data-color="#ff6b6b"></div>
+                        <div class="color-option" data-color="#4ecdc4"></div>
+                        <div class="color-option" data-color="#ffbe0b"></div>
+                        <div class="color-option" data-color="#8338ec"></div>
+                    </div>
+                    <canvas id="drawing-canvas" style="touch-action: none;"></canvas>
+                    <div class="drawing-controls">
+                        <button id="clear-drawing-btn" class="secondary-btn">Clear</button>
+                    </div>
+                </div>
+                <button id="confirm-order-btn" class="primary-btn">Confirm Order</button>
+            </div>
+        </section>
+
+        <!-- Receipt Screen -->
+        <section id="receipt-screen" class="screen">
+            <h2>Thank You!</h2>
+            <div id="receipt-container">
+                <div id="receipt">
+                    <div class="receipt-header">
+                        <img src="assets/logo.png" alt="Narcisa Mimosa Café" class="receipt-logo">
+                        <h3>Narcisa Mimosa Café</h3>
+                        <p class="receipt-address">El Borne, Barcelona</p>
+                        <p class="receipt-contact">Tel: +34 932 123 456</p>
+                    </div>
+                    
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-info">
+                        <p><span>Order #:</span> <span id="receipt-order-number">12345</span></p>
+                        <p><span>Date:</span> <span id="receipt-date">Mar 15, 2025</span></p>
+                        <p><span>Time:</span> <span id="receipt-time">12:30 PM</span></p>
+                        <p><span>Server:</span> <span>Amanda</span></p>
+                    </div>
+                    
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-customer">
+                        <div class="photo-container">
+                            <img src="assets/placeholder.png" alt="Customer Photo" id="receipt-photo">
+                        </div>
+                        <p id="receipt-name">Customer: John Doe</p>
+                    </div>
+                    
+                    <div class="receipt-items">
+                        <h4>Order Details:</h4>
+                        <div id="receipt-items-list">
+                            <!-- Items will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-totals">
+                        <div class="receipt-total-row">
+                            <span>Subtotal:</span>
+                            <span id="receipt-subtotal">€0.00</span>
+                        </div>
+                        <div class="receipt-total-row">
+                            <span>Tax (10% IVA):</span>
+                            <span id="receipt-tax">€0.00</span>
+                        </div>
+                        <div class="receipt-total-row total">
+                            <span>Total:</span>
+                            <span id="receipt-total">€0.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-payment">
+                        <p><span>Payment Method:</span> <span>Card</span></p>
+                        <p><span>Card:</span> <span>**** **** **** <span id="receipt-card-last4">1234</span></span></p>
+                    </div>
+                    
+                    <div class="receipt-divider"></div>
+                    
+                    <div class="receipt-doodle">
+                        <h4>Your Message:</h4>
+                        <img src="" alt="Customer Doodle" id="receipt-doodle">
+                    </div>
+                    
+                    <div class="receipt-footer">
+                        <p class="receipt-thank-you">Thank you for visiting us!</p>
+                        <p class="receipt-return">We hope to see you again soon!</p>
+                    </div>
+                </div>
+            </div>
+            <button id="download-receipt-btn" class="primary-btn">Download Receipt</button>
+            <button id="new-order-btn" class="secondary-btn">Start New Order</button>
+        </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
