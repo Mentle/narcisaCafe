@@ -152,32 +152,38 @@ button {
 
 /* Identity Screen */
 .camera-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
     width: 100%;
+    max-width: 400px;
+    height: 400px;
     margin: 0 auto;
-    width: 300px;
-    height: 300px;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 1rem 0;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    background: #000;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-#camera-preview, #captured-photo {
+#camera-preview {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scaleX(-1); /* Mirror the camera */
+}
+
+#captured-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1); /* Mirror the photo too */
+}
+
+#photo-canvas {
+    display: none;
 }
 
 .camera-controls {
     display: flex;
     justify-content: center;
-    align-items: center;
     gap: 1rem;
-    width: 100%;
     margin: 1rem 0;
 }
 
@@ -196,6 +202,7 @@ button {
 }
 
 #photo-confirmation {
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -212,49 +219,29 @@ button {
 
 .name-input {
     margin: 1rem 0;
-    width: 100%;
-    max-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-left: auto;
-    margin-right: auto;
     text-align: center;
 }
 
 .name-input label {
     display: block;
     margin-bottom: 0.5rem;
-    text-align: center;
-    width: 100%;
     font-weight: 500;
 }
 
 .name-input input {
     width: 100%;
-    padding: 0.8rem;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    text-align: center;
-    margin: 0 auto;
-}
-
-/* Center input field and make it responsive */
-#customer-name {
-    width: 100%;
+    max-width: 300px;
     padding: 0.75rem;
-    border-radius: 8px;
     border: 1px solid #ddd;
+    border-radius: 4px;
     font-size: 1rem;
     text-align: center;
 }
 
-/* Center buttons */
-.primary-btn, .secondary-btn {
-    margin: 0.5rem auto;
-    display: block;
+@media (max-width: 480px) {
+    .camera-container {
+        height: 300px;
+    }
 }
 
 /* Order Screen */
@@ -733,11 +720,6 @@ button {
         margin-bottom: 1.5rem;
     }
     
-    .camera-container {
-        width: 250px;
-        height: 250px;
-    }
-    
     .menu-tabs {
         flex-wrap: wrap;
     }
@@ -852,11 +834,6 @@ button {
         height: 180px;
     }
     
-    .camera-container {
-        width: 280px;
-        height: 280px;
-    }
-    
     .pastry-grid, .coffee-grid, .drinks-grid, .salty-grid {
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
@@ -896,11 +873,6 @@ button {
     .logo-container {
         width: 200px;
         height: 200px;
-    }
-    
-    .camera-container {
-        width: 320px;
-        height: 320px;
     }
     
     .pastry-grid, .coffee-grid, .drinks-grid, .salty-grid {
@@ -943,11 +915,6 @@ button {
     .logo-container {
         width: 220px;
         height: 220px;
-    }
-    
-    .camera-container {
-        width: 350px;
-        height: 350px;
     }
     
     .pastry-grid, .coffee-grid, .drinks-grid, .salty-grid {

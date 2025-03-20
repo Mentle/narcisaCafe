@@ -310,15 +310,19 @@ async function initializeCamera() {
             }
         }
         
-        // Request camera permissions with specific constraints
+        // Detect if we're on mobile
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        
+        // Set up constraints based on device
         const constraints = {
             video: {
                 facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+                width: { ideal: isMobile ? 720 : 1280 },
+                height: { ideal: isMobile ? 1280 : 720 }
             }
         };
         
+        // Request camera access
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         
         // Make sure video element exists
@@ -330,11 +334,27 @@ async function initializeCamera() {
         cameraPreview.srcObject = stream;
         cameraPreview.style.display = 'block';
         
+        // Important: Set video element attributes
+        cameraPreview.setAttribute('playsinline', ''); // Prevent fullscreen on iOS
+        cameraPreview.setAttribute('autoplay', '');
+        cameraPreview.setAttribute('muted', '');
+        
         // Wait for video to be ready
         await new Promise((resolve) => {
             cameraPreview.onloadedmetadata = () => {
+                // Set video dimensions
+                if (isMobile) {
+                    // On mobile, make sure video fills the container
+                    cameraPreview.style.width = '100%';
+                    cameraPreview.style.height = '100%';
+                    cameraPreview.style.objectFit = 'cover';
+                }
+                
                 cameraPreview.play()
-                    .then(resolve)
+                    .then(() => {
+                        console.log('Camera stream started');
+                        resolve();
+                    })
                     .catch(e => {
                         console.warn('Autoplay prevented:', e);
                         resolve();
@@ -377,8 +397,8 @@ async function initializeCamera() {
 
 function takePhoto() {
     try {
-        if (!cameraPreview || !cameraPreview.videoWidth) {
-            throw new Error('Camera is not ready yet');
+        if (!cameraPreview || !cameraPreview.videoWidth || !cameraPreview.srcObject) {
+            throw new Error('Camera is not ready yet. Please wait a moment and try again.');
         }
         
         // Create canvas if it doesn't exist
@@ -388,13 +408,31 @@ function takePhoto() {
             document.body.appendChild(photoCanvas);
         }
         
+        // Set canvas dimensions to match video
+        const videoWidth = cameraPreview.videoWidth;
+        const videoHeight = cameraPreview.videoHeight;
+        
+        // Calculate dimensions to maintain aspect ratio
+        let targetWidth = videoWidth;
+        let targetHeight = videoHeight;
+        
+        // If the video is in portrait mode (mobile)
+        if (videoHeight > videoWidth) {
+            targetWidth = Math.floor(videoWidth * (720 / videoHeight));
+            targetHeight = 720;
+        } else {
+            targetWidth = 720;
+            targetHeight = Math.floor(videoHeight * (720 / videoWidth));
+        }
+        
+        photoCanvas.width = targetWidth;
+        photoCanvas.height = targetHeight;
+        
         const context = photoCanvas.getContext('2d');
-        photoCanvas.width = cameraPreview.videoWidth;
-        photoCanvas.height = cameraPreview.videoHeight;
-        context.drawImage(cameraPreview, 0, 0, photoCanvas.width, photoCanvas.height);
+        context.drawImage(cameraPreview, 0, 0, targetWidth, targetHeight);
         
         // Save photo and update UI
-        state.customerPhoto = photoCanvas.toDataURL('image/png');
+        state.customerPhoto = photoCanvas.toDataURL('image/jpeg', 0.8);
         
         // Update all photo elements
         if (capturedPhoto) {
@@ -405,6 +443,11 @@ function takePhoto() {
         // Hide camera preview and show confirmation
         if (cameraPreview) {
             cameraPreview.style.display = 'none';
+            // Stop the camera stream
+            const stream = cameraPreview.srcObject;
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
         }
         if (takePhotoBtn) {
             takePhotoBtn.style.display = 'none';
@@ -418,17 +461,27 @@ function takePhoto() {
         
     } catch (err) {
         console.error('Error taking photo:', err);
-        alert('Unable to take photo. ' + err.message);
+        alert(err.message);
     }
 }
 
 function retakePhoto() {
-    cameraPreview.style.display = 'block';
-    capturedPhoto.style.display = 'none';
-    takePhotoBtn.style.display = 'inline-block';
-    retakePhotoBtn.style.display = 'none';
-    photoConfirmation.style.display = 'none';
-    state.customerPhoto = null;
+    // Clear the previous photo
+    if (capturedPhoto) {
+        capturedPhoto.style.display = 'none';
+    }
+    if (photoConfirmation) {
+        photoConfirmation.style.display = 'none';
+    }
+    if (retakePhotoBtn) {
+        retakePhotoBtn.style.display = 'none';
+    }
+    if (takePhotoBtn) {
+        takePhotoBtn.style.display = 'inline-block';
+    }
+    
+    // Reinitialize the camera
+    initializeCamera();
 }
 
 function confirmIdentity() {
