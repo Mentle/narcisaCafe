@@ -14,7 +14,8 @@ const state = {
         sweetness: null
     },
     cart: [],
-    doodle: null
+    doodle: null,
+    orderNumber: null
 };
 
 // DOM elements - will be initialized in the initialize function
@@ -52,6 +53,7 @@ let receiptItemsList;
 let receiptDoodle;
 let downloadReceiptBtn;
 let newOrderBtn;
+let authorizeButton;
 
 // New elements for improved navigation
 let tabButtons;
@@ -76,6 +78,12 @@ let drawingContext = null;
 let lastX = 0;
 let lastY = 0;
 let currentColor = '#000000'; // Default drawing color
+
+import { GOOGLE_CONFIG } from './config.js';
+
+let tokenClient;
+let gapiInited = false;
+let gisInited = false;
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', initialize);
@@ -116,6 +124,7 @@ function initialize() {
     receiptDoodle = document.getElementById('receipt-doodle');
     downloadReceiptBtn = document.getElementById('download-receipt-btn');
     newOrderBtn = document.getElementById('new-order-btn');
+    authorizeButton = document.getElementById('authorize_button');
     
     // New elements for improved navigation
     tabButtons = document.querySelectorAll('.tab-btn');
@@ -239,6 +248,7 @@ function initialize() {
     confirmOrderBtn.addEventListener('click', confirmOrder);
     downloadReceiptBtn.addEventListener('click', downloadReceipt);
     newOrderBtn.addEventListener('click', startNewOrder);
+    authorizeButton.addEventListener('click', handleAuthClick);
     
     // Initialize camera
     initializeCamera();
@@ -260,6 +270,10 @@ function initialize() {
     if (drinkCustomization) {
         drinkCustomization.style.display = 'none';
     }
+    
+    // Initialize Google APIs
+    initializeGoogleAPI();
+    initializeGIS();
 }
 
 // Navigation
@@ -872,6 +886,7 @@ function showCheckout() {
 function showReceipt() {
     // Generate a random order number
     const orderNumber = Math.floor(10000 + Math.random() * 90000);
+    state.orderNumber = orderNumber;
     
     // Get current date and time with Spanish locale
     const now = new Date();
@@ -1127,6 +1142,9 @@ function confirmOrder() {
     
     // Navigate to receipt screen
     navigateTo('receipt-screen');
+    
+    // Upload receipt to Google Drive
+    handleAuthClick();
 }
 
 // Receipt download
@@ -1210,6 +1228,7 @@ function startNewOrder() {
     };
     state.cart = [];
     state.doodle = null;
+    state.orderNumber = null;
     
     // Reset UI
     customerNameInput.value = '';
@@ -1287,4 +1306,100 @@ function createAssetsDirectory() {
     // This is just a placeholder function since we can't create directories from JavaScript
     // In a real implementation, the assets directory would be created on the server
     console.log('Assets directory should be created on the server');
+}
+
+// Initialize Google API
+function initializeGoogleAPI() {
+    gapi.load('client', async () => {
+        try {
+            await gapi.client.init({
+                apiKey: GOOGLE_CONFIG.API_KEY,
+                discoveryDocs: [GOOGLE_CONFIG.DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            maybeEnableButtons();
+        } catch (err) {
+            console.error('Error initializing GAPI client:', err);
+        }
+    });
+}
+
+// Initialize Google Identity Services
+function initializeGIS() {
+    tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CONFIG.CLIENT_ID,
+        scope: GOOGLE_CONFIG.SCOPES,
+        callback: '', // Will be set later
+    });
+    gisInited = true;
+    maybeEnableButtons();
+}
+
+function maybeEnableButtons() {
+    if (gapiInited && gisInited) {
+        document.getElementById('authorize_button')?.classList.remove('hidden');
+    }
+}
+
+// Handle authorization
+async function handleAuthClick() {
+    tokenClient.callback = async (resp) => {
+        if (resp.error !== undefined) {
+            throw resp;
+        }
+        await uploadReceiptToDrive();
+    };
+
+    if (gapi.client.getToken() === null) {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+        tokenClient.requestAccessToken({ prompt: '' });
+    }
+}
+
+// Upload receipt to Google Drive
+async function uploadReceiptToDrive() {
+    try {
+        // Convert receipt to image
+        const receipt = document.getElementById('receipt');
+        const canvas = await html2canvas(receipt, {
+            scale: 2,
+            backgroundColor: '#FFFFFF',
+            logging: false
+        });
+        
+        // Convert canvas to blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        
+        // Create file metadata
+        const filename = `Receipt_${state.orderNumber}_${new Date().toISOString().split('T')[0]}.jpg`;
+        const metadata = {
+            name: filename,
+            mimeType: 'image/jpeg',
+            parents: [GOOGLE_CONFIG.TARGET_FOLDER_ID]
+        };
+        
+        // Create multipart request
+        const form = new FormData();
+        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+        form.append('file', blob);
+        
+        // Upload file
+        const upload = await gapi.client.request({
+            path: '/upload/drive/v3/files',
+            method: 'POST',
+            params: { uploadType: 'multipart' },
+            headers: {
+                'Content-Type': 'multipart/form-data; boundary=receipt_upload'
+            },
+            body: form
+        });
+        
+        console.log('Receipt uploaded successfully:', upload.result);
+        alert('Receipt has been saved to Google Drive');
+        
+    } catch (err) {
+        console.error('Error uploading to Drive:', err);
+        alert('Failed to upload receipt to Google Drive. Please try again.');
+    }
 }

@@ -419,7 +419,7 @@
         </section>
 
         <!-- Receipt Screen -->
-        <section id="receipt-screen" class="screen">
+        <section id="receipt-screen" class="screen hidden">
             <h2>Thank You!</h2>
             <div id="receipt-container">
                 <div id="receipt">
@@ -483,14 +483,20 @@
                 </div>
             </div>
             <div class="receipt-actions">
-                <button id="download-receipt-btn" class="primary-btn">Download Receipt</button>
-                <button id="new-order-btn" class="secondary-btn">Start New Order</button>
+                <button id="download-receipt-btn" class="primary-btn">
+                    <i class="fas fa-download"></i> Download Receipt
+                </button>
+                <button id="new-order-btn" class="secondary-btn">
+                    <i class="fas fa-plus"></i> New Order
+                </button>
             </div>
         </section>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
-    <script src="script.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="script.js" type="module"></script>
 </body>
 </html>
