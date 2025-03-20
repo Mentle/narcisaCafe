@@ -413,26 +413,41 @@ function takePhoto() {
         const videoHeight = cameraPreview.videoHeight;
         
         // Calculate dimensions to maintain aspect ratio
-        let targetWidth = videoWidth;
-        let targetHeight = videoHeight;
+        let targetWidth = 140;
+        let targetHeight = 140;
         
-        // If the video is in portrait mode (mobile)
-        if (videoHeight > videoWidth) {
-            targetWidth = Math.floor(videoWidth * (720 / videoHeight));
-            targetHeight = 720;
-        } else {
-            targetWidth = 720;
-            targetHeight = Math.floor(videoHeight * (720 / videoWidth));
-        }
+        // Calculate the scaling factor
+        const scale = Math.max(targetWidth / videoWidth, targetHeight / videoHeight);
         
+        // Calculate dimensions that cover the target area while maintaining aspect ratio
+        const width = videoWidth * scale;
+        const height = videoHeight * scale;
+        
+        // Calculate cropping
+        const left = (width - targetWidth) / 2;
+        const top = (height - targetHeight) / 2;
+        
+        // Set canvas size to our target dimensions
         photoCanvas.width = targetWidth;
         photoCanvas.height = targetHeight;
         
         const context = photoCanvas.getContext('2d');
-        context.drawImage(cameraPreview, 0, 0, targetWidth, targetHeight);
+        
+        // Clear the canvas
+        context.fillStyle = '#FFFFFF';
+        context.fillRect(0, 0, targetWidth, targetHeight);
+        
+        // Draw the video frame, cropped to center
+        context.drawImage(
+            cameraPreview,
+            left / scale, top / scale, // Source x,y
+            targetWidth / scale, targetHeight / scale, // Source width,height
+            0, 0, // Destination x,y
+            targetWidth, targetHeight // Destination width,height
+        );
         
         // Save photo and update UI
-        state.customerPhoto = photoCanvas.toDataURL('image/jpeg', 0.8);
+        state.customerPhoto = photoCanvas.toDataURL('image/jpeg', 0.9);
         
         // Update all photo elements
         if (capturedPhoto) {

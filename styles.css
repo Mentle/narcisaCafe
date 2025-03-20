@@ -1055,10 +1055,10 @@ button {
 }
 
 #receipt {
-    margin: 0 auto;
-    width: 384px; /* 4 inches at 96 DPI */
-    height: 576px; /* 6 inches at 96 DPI */
-    background-color: white;
+    width: 100%;
+    max-width: 384px;
+    min-height: 576px;
+    background: white;
     padding: 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -1067,6 +1067,7 @@ button {
     font-size: 0.75rem;
     line-height: 1.2;
     position: relative;
+    margin: 0 auto;
 }
 
 .receipt-header {
@@ -1116,6 +1117,10 @@ button {
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 0.25rem;
+    background: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .photo-container img {
@@ -1237,10 +1242,11 @@ button {
     
     #receipt {
         position: absolute;
-        left: 0;
+        left: 50%;
         top: 0;
+        transform: translateX(-50%);
         width: 384px !important;
-        height: 576px !important;
+        min-height: 576px !important;
         margin: 0;
         padding: 0.75rem;
         box-shadow: none;
@@ -1262,4 +1268,40 @@ button {
 
 .receipt-actions button {
     width: 100%;
+}
+
+/* Receipt container */
+#receipt-container {
+    width: 100%;
+    max-width: 384px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Receipt screen */
+#receipt-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+
+#receipt-screen h2 {
+    margin-bottom: 1rem;
+}
+
+/* Mobile styles */
+@media (max-width: 480px) {
+    #receipt-container {
+        padding: 0.5rem;
+    }
+    
+    #receipt {
+        padding: 0.5rem;
+    }
+    
+    .photo-container {
+        width: 120px;
+        height: 120px;
+    }
 }
