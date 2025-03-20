@@ -15,6 +15,7 @@ const state = {
     },
     cart: [],
     doodle: null,
+    compliments: '',
     orderNumber: null
 };
 
@@ -53,6 +54,7 @@ let receiptItemsList;
 let receiptDoodle;
 let downloadReceiptBtn;
 let newOrderBtn;
+let complimentsText;
 
 // New elements for improved navigation
 let tabButtons;
@@ -122,6 +124,7 @@ function initialize() {
     receiptDoodle = document.getElementById('receipt-doodle');
     downloadReceiptBtn = document.getElementById('download-receipt-btn');
     newOrderBtn = document.getElementById('new-order-btn');
+    complimentsText = document.getElementById('compliments-text');
     
     // New elements for improved navigation
     tabButtons = document.querySelectorAll('.tab-btn');
@@ -945,7 +948,7 @@ function showReceipt() {
         <div class="receipt-header">
             <div class="header-left">
                 <h3>Narcisa Mimosa Café</h3>
-                <p class="receipt-address">El Borne, Barcelona</p>
+                <p class="receipt-address">30th Anniversary Special</p>
             </div>
             <img src="assets/logo.png" alt="Logo" class="receipt-logo">
         </div>
@@ -961,6 +964,8 @@ function showReceipt() {
             <div class="receipt-row">
                 <span>Order #${orderNumber}</span>
                 <span>${dateStr}</span>
+            </div>
+            <div class="receipt-row">
                 <span>Server: Amanda</span>
                 <span>${timeStr}</span>
             </div>
@@ -995,7 +1000,12 @@ function showReceipt() {
         </div>
         
         <div class="receipt-message">
-            <p>Your Message:</p>
+            ${state.compliments ? `
+                <div class="receipt-compliments">
+                    <p>Compliments to the Chef:</p>
+                    <div class="compliments-text">${state.compliments}</div>
+                </div>
+            ` : ''}
             <div class="doodle-container">
                 <img src="${state.doodle}" alt="Customer doodle" id="receipt-doodle">
             </div>
@@ -1181,12 +1191,8 @@ function showTipDrawing() {
 function confirmOrder() {
     // Save the doodle
     state.doodle = drawingCanvas.toDataURL('image/png');
-    
-    // Update receipt content
+    state.compliments = complimentsText.value.trim();
     showReceipt();
-    
-    // Navigate to receipt screen
-    navigateTo('receipt-screen');
 }
 
 // Receipt download
@@ -1270,6 +1276,7 @@ function startNewOrder() {
     };
     state.cart = [];
     state.doodle = null;
+    state.compliments = '';
     state.orderNumber = null;
     
     // Reset UI
@@ -1295,6 +1302,7 @@ function startNewOrder() {
     addTipBtn.style.display = 'block';
     tipContainer.style.display = 'none';
     clearDrawing();
+    complimentsText.value = '';
     
     // Navigate back to welcome screen
     navigateTo('welcome-screen');
@@ -1349,3 +1357,30 @@ function createAssetsDirectory() {
     // In a real implementation, the assets directory would be created on the server
     console.log('Assets directory should be created on the server');
 }
+
+const menu = {
+    coffee: [
+        { id: 'espresso', name: 'Espresso', price: 899.99, image: 'assets/espresso.jpg', customizations: ['Extra Shot', 'Iced'] },
+        { id: 'cappuccino', name: 'Cappuccino', price: 1299.99, image: 'assets/cappuccino.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk'] },
+        { id: 'latte', name: 'Latte', price: 1499.99, image: 'assets/latte.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk', 'Vanilla', 'Caramel'] },
+        { id: 'americano', name: 'Americano', price: 749.99, image: 'assets/americano.jpg', customizations: ['Extra Shot', 'Iced'] },
+        { id: 'mocha', name: 'Mocha', price: 1699.99, image: 'assets/mocha.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk', 'Extra Chocolate'] },
+        { id: 'flatWhite', name: 'Flat White', price: 1399.99, image: 'assets/flat-white.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk'] }
+    ],
+    food: [
+        { id: 'croissant', name: 'Croissant', price: 499.99, image: 'assets/croissant.jpg' },
+        { id: 'muffin', name: 'Muffin', price: 599.99, image: 'assets/muffin.jpg' },
+        { id: 'sandwich', name: 'Sandwich', price: 2499.99, image: 'assets/sandwich.jpg' },
+        { id: 'cake', name: 'Cake Slice', price: 1999.99, image: 'assets/cake.jpg' }
+    ],
+    customizations: {
+        'Extra Shot': 299.99,
+        'Oat Milk': 399.99,
+        'Soy Milk': 399.99,
+        'Almond Milk': 399.99,
+        'Vanilla': 299.99,
+        'Caramel': 299.99,
+        'Extra Chocolate': 499.99,
+        'Iced': 199.99
+    }
+};

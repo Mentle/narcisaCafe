@@ -1058,7 +1058,7 @@ button {
     width: 100%;
     max-width: 384px;
     min-height: 576px;
-    background: white;
+    background: #ffffff;
     padding: 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
@@ -1089,12 +1089,13 @@ button {
     margin: 0;
     font-size: 1rem;
     font-weight: bold;
+    color: #000000;
 }
 
 .receipt-address {
     margin: 0;
     font-size: 0.7rem;
-    color: #666;
+    color: #000000;
 }
 
 .receipt-logo {
@@ -1133,6 +1134,7 @@ button {
     margin: 0;
     font-size: 0.8rem;
     font-weight: bold;
+    color: #000000;
 }
 
 .receipt-info-compact {
@@ -1154,7 +1156,7 @@ button {
     margin: 0.5rem 0;
     padding: 0.25rem;
     background: #fff;
-    border: 1px solid #eee;
+    border: 1px solid #000000;
     border-radius: 4px;
 }
 
@@ -1163,10 +1165,11 @@ button {
     justify-content: space-between;
     font-size: 0.7rem;
     padding: 0.15rem 0;
+    color: #000000;
 }
 
 .receipt-item:not(:last-child) {
-    border-bottom: 1px dotted #eee;
+    border-bottom: 1px dotted #000000;
 }
 
 .receipt-totals {
@@ -1188,14 +1191,18 @@ button {
     font-size: 0.8rem;
     margin-top: 0.15rem;
     padding-top: 0.15rem;
-    border-top: 1px solid #000;
+    border-top: 1px solid #000000;
 }
 
 .receipt-payment {
     font-size: 0.7rem;
-    text-align: right;
-    color: #666;
+    text-align: center;
+    color: #000000;
     margin: 0.25rem 0;
+    padding: 0.25rem;
+    background: #f8f8f8;
+    border-radius: 4px;
+    border-bottom: 1px dashed #000000;
 }
 
 .receipt-doodle {
@@ -1219,7 +1226,7 @@ button {
     align-items: center;
     justify-content: center;
     background: #ffffff;
-    border: 1px solid #eee;
+    border: 1px solid #000000;
     border-radius: 4px;
     padding: 0.25rem;
 }
@@ -1228,6 +1235,33 @@ button {
     width: 100%;
     height: 100%;
     object-fit: contain;
+}
+
+.receipt-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px solid #000000;
+}
+
+.receipt-row:last-child {
+    border-bottom: none;
+}
+
+.receipt-items .receipt-row {
+    border-bottom: 1px solid #000000;
+}
+
+.receipt-items .receipt-row:last-child {
+    border-bottom: none;
+}
+
+.receipt-totals .total {
+    border-top: 2px solid #000000;
+    margin-top: 8px;
+    padding-top: 8px;
+    font-weight: bold;
 }
 
 /* Print styles */
@@ -1304,4 +1338,75 @@ button {
         width: 120px;
         height: 120px;
     }
+}
+
+.drawing-container {
+    width: 100%;
+    height: 200px;
+    margin: 20px 0;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#drawing-canvas {
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+}
+
+.compliments-container {
+    margin: 20px 0;
+}
+
+.compliments-container h3 {
+    margin-bottom: 10px;
+    font-size: 16px;
+    color: #000000;
+}
+
+#compliments-text {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #000000;
+    border-radius: 4px;
+    font-size: 14px;
+    resize: none;
+    background: #ffffff;
+    color: #000000;
+}
+
+#compliments-text::placeholder {
+    color: #666666;
+}
+
+.receipt-compliments {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #000000;
+}
+
+.receipt-compliments p {
+    color: #000000;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.compliments-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #000000;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 4px;
+    background: #ffffff;
+}
+
+.doodle-container {
+    height: 150px;
+    border: 1px solid #000000;
+    padding: 10px;
+    border-radius: 5px;
+    background: #ffffff;
+    margin-top: 10px;
 }
