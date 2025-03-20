@@ -8,6 +8,11 @@ const state = {
         milk: null,
         extras: []
     },
+    selectedDrink: null,
+    selectedDrinkOptions: {
+        ice: null,
+        sweetness: null
+    },
     cart: [],
     doodle: null
 };
@@ -25,8 +30,11 @@ let customerNameInput;
 let photoConfirmation;
 let menuItems;
 let coffeeCustomization;
+let drinkCustomization;
 let milkOptions;
 let extraOptions;
+let iceOptions;
+let sweetnessOptions;
 let addToCartBtn;
 let cartItems;
 let cartTotal;
@@ -48,7 +56,9 @@ let newOrderBtn;
 // New elements for improved navigation
 let tabButtons;
 let backToMenuBtn;
+let backToMenuFromDrinkBtn;
 let selectedCoffeeName;
+let selectedDrinkName;
 let customerNameDisplay;
 let customerPhotoSmall;
 
@@ -84,8 +94,11 @@ function initialize() {
     photoConfirmation = document.getElementById('photo-confirmation');
     menuItems = document.querySelectorAll('.menu-item');
     coffeeCustomization = document.getElementById('coffee-customization');
+    drinkCustomization = document.getElementById('drink-customization');
     milkOptions = document.querySelectorAll('.option-item[data-option^="Soy"], .option-item[data-option^="Almond"], .option-item[data-option^="Oat"], .option-item[data-option^="Normal"]');
     extraOptions = document.querySelectorAll('.option-item[data-option^="Brown"], .option-item[data-option^="Honey"], .option-item[data-option^="Cinnamon"], .option-item[data-option^="Cacao"]');
+    iceOptions = document.querySelectorAll('.option-item[data-option^="No Ice"], .option-item[data-option^="Light"], .option-item[data-option^="Regular Ice"], .option-item[data-option^="Extra Ice"]');
+    sweetnessOptions = document.querySelectorAll('.option-item[data-option^="No Sugar"], .option-item[data-option^="Half"], .option-item[data-option^="Regular Sugar"], .option-item[data-option^="Extra Sugar"]');
     addToCartBtn = document.getElementById('add-to-cart-btn');
     cartItems = document.getElementById('cart-items');
     cartTotal = document.getElementById('cart-total');
@@ -107,7 +120,9 @@ function initialize() {
     // New elements for improved navigation
     tabButtons = document.querySelectorAll('.tab-btn');
     backToMenuBtn = document.getElementById('back-to-menu-btn');
+    backToMenuFromDrinkBtn = document.getElementById('back-to-menu-from-drink-btn');
     selectedCoffeeName = document.getElementById('selected-coffee-name');
+    selectedDrinkName = document.getElementById('selected-drink-name');
     customerNameDisplay = document.getElementById('customer-name-display');
     customerPhotoSmall = document.getElementById('customer-photo-small');
     
@@ -153,10 +168,17 @@ function initialize() {
         });
     });
     
-    // Back to menu button
+    // Back to menu buttons
     if (backToMenuBtn) {
         backToMenuBtn.addEventListener('click', () => {
             coffeeCustomization.style.display = 'none';
+            document.querySelector('.menu-container').style.display = 'block';
+        });
+    }
+    
+    if (backToMenuFromDrinkBtn) {
+        backToMenuFromDrinkBtn.addEventListener('click', () => {
+            drinkCustomization.style.display = 'none';
             document.querySelector('.menu-container').style.display = 'block';
         });
     }
@@ -194,7 +216,20 @@ function initialize() {
         option.addEventListener('click', () => toggleExtraOption(option));
     });
     
-    addToCartBtn.addEventListener('click', addToCart);
+    iceOptions.forEach(option => {
+        option.addEventListener('click', () => selectIceOption(option));
+    });
+    
+    sweetnessOptions.forEach(option => {
+        option.addEventListener('click', () => selectSweetnessOption(option));
+    });
+    
+    // Add to cart button click event
+    const addToCartBtns = document.querySelectorAll('#add-to-cart-btn');
+    addToCartBtns.forEach(btn => {
+        btn.addEventListener('click', addToCart);
+    });
+    
     checkoutBtn.addEventListener('click', () => {
         cartModal.classList.remove('show');
         navigateTo('checkout-screen');
@@ -216,6 +251,15 @@ function initialize() {
     
     // Create placeholder images for menu items
     createPlaceholderImages();
+    
+    // Make sure customization panels are hidden by default
+    if (coffeeCustomization) {
+        coffeeCustomization.style.display = 'none';
+    }
+    
+    if (drinkCustomization) {
+        drinkCustomization.style.display = 'none';
+    }
 }
 
 // Navigation
@@ -289,6 +333,19 @@ function confirmIdentity() {
     customerNameDisplay.textContent = state.customerName;
     customerPhotoSmall.src = state.customerPhoto;
     
+    // Make sure customization panels are hidden and menu container is visible
+    if (coffeeCustomization) {
+        coffeeCustomization.style.display = 'none';
+    }
+    
+    if (drinkCustomization) {
+        drinkCustomization.style.display = 'none';
+    }
+    
+    if (document.querySelector('.menu-container')) {
+        document.querySelector('.menu-container').style.display = 'block';
+    }
+    
     navigateTo('order-screen');
 }
 
@@ -298,31 +355,57 @@ function selectMenuItem(item) {
     const itemName = item.dataset.item;
     const itemPrice = parseFloat(item.dataset.price);
     
-    if (itemType === 'pastry') {
-        // Toggle selection for pastries
+    if (itemType === 'pastry' || itemType === 'salty') {
+        // Toggle selection for pastries and salty items
         item.classList.toggle('selected');
         
         // If selected, add to cart immediately
         if (item.classList.contains('selected')) {
-            const pastryItem = {
+            const menuItem = {
                 name: itemName,
-                type: 'pastry',
+                type: itemType,
                 price: itemPrice
             };
             
-            state.cart.push(pastryItem);
+            state.cart.push(menuItem);
             updateCart();
             animateCartIcon();
         } else {
             // If deselected, remove from cart
             const index = state.cart.findIndex(cartItem => 
-                cartItem.type === 'pastry' && cartItem.name === itemName);
+                cartItem.type === itemType && cartItem.name === itemName);
             
             if (index !== -1) {
                 state.cart.splice(index, 1);
                 updateCart();
             }
         }
+    } else if (itemType === 'drink') {
+        // Single selection for drinks
+        menuItems.forEach(menuItem => {
+            if (menuItem.dataset.type === 'drink') {
+                menuItem.classList.remove('selected');
+            }
+        });
+        
+        item.classList.add('selected');
+        state.selectedDrink = itemName;
+        state.selectedDrinkPrice = itemPrice;
+        state.selectedDrinkOptions = {
+            ice: null,
+            sweetness: null
+        };
+        
+        // Reset customization options
+        iceOptions.forEach(option => option.classList.remove('selected'));
+        sweetnessOptions.forEach(option => option.classList.remove('selected'));
+        
+        // Update selected drink name in customization panel
+        selectedDrinkName.textContent = itemName;
+        
+        // Show customization panel, hide menu container
+        document.querySelector('.menu-container').style.display = 'none';
+        drinkCustomization.style.display = 'block';
     } else if (itemType === 'coffee') {
         // Single selection for coffee
         menuItems.forEach(menuItem => {
@@ -373,31 +456,76 @@ function toggleExtraOption(option) {
     }
 }
 
+function selectIceOption(option) {
+    iceOptions.forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+    state.selectedDrinkOptions.ice = option.dataset.option;
+}
+
+function selectSweetnessOption(option) {
+    sweetnessOptions.forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+    state.selectedDrinkOptions.sweetness = option.dataset.option;
+}
+
 // Cart functions
 function addToCart() {
-    if (state.selectedCoffee) {
+    if (state.selectedDrink) {
+        const drinkItem = {
+            name: state.selectedDrink,
+            type: 'drink',
+            options: {
+                ice: state.selectedDrinkOptions.ice,
+                sweetness: state.selectedDrinkOptions.sweetness
+            },
+            price: state.selectedDrinkPrice
+        };
+        
+        state.cart.push(drinkItem);
+        
+        // Reset drink selection
+        state.selectedDrink = null;
+        state.selectedDrinkOptions = {
+            ice: null,
+            sweetness: null
+        };
+    } else if (state.selectedCoffee) {
         const coffeeItem = {
             name: state.selectedCoffee,
             type: 'coffee',
             options: {
                 milk: state.selectedCoffeeOptions.milk,
-                extras: [...state.selectedCoffeeOptions.extras]
+                extras: state.selectedCoffeeOptions.extras
             },
             price: state.selectedCoffeePrice
         };
         
         state.cart.push(coffeeItem);
+        
+        // Reset coffee selection
+        state.selectedCoffee = null;
+        state.selectedCoffeeOptions = {
+            milk: null,
+            extras: []
+        };
     }
     
-    // Reset coffee selection
+    // Reset drink and coffee selection in the UI
     menuItems.forEach(menuItem => {
-        if (menuItem.dataset.type === 'coffee') {
+        if (menuItem.dataset.type === 'drink' || menuItem.dataset.type === 'coffee') {
             menuItem.classList.remove('selected');
         }
     });
     
-    // Hide customization panel, show menu container
+    // Reset customization options
+    milkOptions.forEach(option => option.classList.remove('selected'));
+    extraOptions.forEach(option => option.classList.remove('selected'));
+    iceOptions.forEach(option => option.classList.remove('selected'));
+    sweetnessOptions.forEach(option => option.classList.remove('selected'));
+    
+    // Hide customization panels, show menu container
     coffeeCustomization.style.display = 'none';
+    drinkCustomization.style.display = 'none';
     document.querySelector('.menu-container').style.display = 'block';
     
     // Update cart display
@@ -431,6 +559,14 @@ function updateCart() {
             
             if (item.options.extras.length > 0) {
                 itemDescription += ` + ${item.options.extras.join(', ')}`;
+            }
+        } else if (item.type === 'drink' && item.options) {
+            if (item.options.ice) {
+                itemDescription += ` with ${item.options.ice}`;
+            }
+            
+            if (item.options.sweetness) {
+                itemDescription += ` and ${item.options.sweetness} sweetness`;
             }
         }
         
@@ -508,6 +644,14 @@ function showCheckout() {
             if (item.options.extras.length > 0) {
                 itemDescription += ` + ${item.options.extras.join(', ')}`;
             }
+        } else if (item.type === 'drink' && item.options) {
+            if (item.options.ice) {
+                itemDescription += ` with ${item.options.ice}`;
+            }
+            
+            if (item.options.sweetness) {
+                itemDescription += ` and ${item.options.sweetness} sweetness`;
+            }
         }
         
         itemElement.innerHTML = `
@@ -575,10 +719,13 @@ function showReceipt() {
     document.getElementById('receipt-card-last4').textContent = cardLast4;
     
     // Populate customer info and items
-    receiptPhoto.src = state.customerPhoto;
-    receiptName.textContent = state.customerName;
+    receiptPhoto.src = state.customerPhoto || 'assets/placeholder.png';
+    receiptName.textContent = `Customer: ${state.customerName}`;
     
+    // Clear previous items
     receiptItemsList.innerHTML = '';
+    
+    // Add items to receipt
     state.cart.forEach(item => {
         const itemElement = document.createElement('div');
         itemElement.className = 'receipt-item';
@@ -589,8 +736,16 @@ function showReceipt() {
                 itemDescription += ` with ${item.options.milk}`;
             }
             
-            if (item.options.extras.length > 0) {
+            if (item.options.extras && item.options.extras.length > 0) {
                 itemDescription += ` + ${item.options.extras.join(', ')}`;
+            }
+        } else if (item.type === 'drink' && item.options) {
+            if (item.options.ice) {
+                itemDescription += ` with ${item.options.ice}`;
+            }
+            
+            if (item.options.sweetness) {
+                itemDescription += `, ${item.options.sweetness}`;
             }
         }
         
@@ -602,9 +757,15 @@ function showReceipt() {
         receiptItemsList.appendChild(itemElement);
     });
     
-    receiptDoodle.src = state.doodle;
+    // Set doodle image
+    if (state.doodle) {
+        receiptDoodle.src = state.doodle;
+        receiptDoodle.style.display = 'block';
+    } else {
+        receiptDoodle.style.display = 'none';
+    }
     
-    navigateTo('receipt-screen');
+    // Note: Navigation to receipt-screen is now handled in confirmOrder()
 }
 
 // Drawing functions
@@ -771,28 +932,74 @@ function confirmOrder() {
     // Save the doodle
     state.doodle = drawingCanvas.toDataURL('image/png');
     
+    // Update receipt content
     showReceipt();
+    
+    // Navigate to receipt screen
+    navigateTo('receipt-screen');
 }
 
 // Receipt download
 function downloadReceipt() {
     const receipt = document.getElementById('receipt');
     
+    // First, ensure the receipt has the correct dimensions
+    receipt.style.width = '384px'; // 4 inches at 96 DPI
+    receipt.style.height = '576px'; // 6 inches at 96 DPI
+    
     // Set specific dimensions for the canvas to match the receipt size
     const options = {
         width: 384, // 4 inches at 96 DPI
-        height: 768, // 8 inches at 96 DPI
-        scale: 2,
+        height: 576, // 6 inches at 96 DPI
+        scale: 2, // Higher scale for better quality
+        backgroundColor: '#ffffff',
         useCORS: true,
         allowTaint: true,
-        backgroundColor: '#ffffff'
+        logging: false,
+        removeContainer: true,
+        imageTimeout: 0,
+        onclone: function(clonedDoc) {
+            // Ensure the cloned receipt has the correct dimensions and styling
+            const clonedReceipt = clonedDoc.getElementById('receipt');
+            clonedReceipt.style.width = '384px';
+            clonedReceipt.style.height = '576px';
+            clonedReceipt.style.overflow = 'hidden';
+            clonedReceipt.style.boxShadow = 'none';
+            clonedReceipt.style.borderRadius = '0';
+            clonedReceipt.style.margin = '0';
+            clonedReceipt.style.padding = '1rem';
+        }
     };
     
+    // Show a loading message
+    const downloadBtn = document.getElementById('download-receipt-btn');
+    const originalText = downloadBtn.textContent;
+    downloadBtn.textContent = 'Generating receipt...';
+    downloadBtn.disabled = true;
+    
+    // Create a canvas from the receipt
     html2canvas(receipt, options).then(canvas => {
-        const link = document.createElement('a');
-        link.download = `narcisa-receipt-${state.customerName.replace(/\s+/g, '-').toLowerCase()}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        // Convert canvas to image data URL
+        const imageData = canvas.toDataURL('image/png');
+        
+        // Create a download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = imageData;
+        downloadLink.download = `Narcisa_Receipt_${state.customerName.replace(/\s+/g, '_')}.png`;
+        
+        // Trigger download
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        // Restore button
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
+    }).catch(error => {
+        console.error('Error generating receipt:', error);
+        downloadBtn.textContent = originalText;
+        downloadBtn.disabled = false;
+        alert('There was an error generating your receipt. Please try again.');
     });
 }
 
@@ -801,10 +1008,15 @@ function startNewOrder() {
     // Reset state
     state.customerPhoto = null;
     state.customerName = '';
+    state.selectedDrink = null;
     state.selectedCoffee = null;
     state.selectedCoffeeOptions = {
         milk: null,
         extras: []
+    };
+    state.selectedDrinkOptions = {
+        ice: null,
+        sweetness: null
     };
     state.cart = [];
     state.doodle = null;
@@ -819,8 +1031,11 @@ function startNewOrder() {
     
     menuItems.forEach(item => item.classList.remove('selected'));
     coffeeCustomization.style.display = 'none';
+    drinkCustomization.style.display = 'none';
     milkOptions.forEach(option => option.classList.remove('selected'));
     extraOptions.forEach(option => option.classList.remove('selected'));
+    iceOptions.forEach(option => option.classList.remove('selected'));
+    sweetnessOptions.forEach(option => option.classList.remove('selected'));
     
     cartItems.innerHTML = '';
     cartTotal.textContent = '€0.00';
