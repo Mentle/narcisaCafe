@@ -282,29 +282,144 @@ function navigateTo(screenId) {
 // Camera functions
 async function initializeCamera() {
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Check if we're running on HTTPS or localhost
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isSecure = window.location.protocol === 'https:';
+        
+        if (!isLocalhost && !isSecure) {
+            throw new Error('Camera access requires HTTPS or localhost for security reasons');
+        }
+        
+        // Check if mediaDevices API is available
+        if (!navigator.mediaDevices) {
+            // Polyfill for older browsers
+            navigator.mediaDevices = {};
+        }
+        
+        if (!navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia = function(constraints) {
+                const getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+                
+                if (!getUserMedia) {
+                    throw new Error('getUserMedia is not supported in this browser');
+                }
+                
+                return new Promise((resolve, reject) => {
+                    getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
+        
+        // Request camera permissions with specific constraints
+        const constraints = {
+            video: {
+                facingMode: 'user',
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            }
+        };
+        
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        
+        // Make sure video element exists
+        if (!cameraPreview) {
+            throw new Error('Camera preview element not found');
+        }
+        
+        // Set up video stream
         cameraPreview.srcObject = stream;
+        cameraPreview.style.display = 'block';
+        
+        // Wait for video to be ready
+        await new Promise((resolve) => {
+            cameraPreview.onloadedmetadata = () => {
+                cameraPreview.play()
+                    .then(resolve)
+                    .catch(e => {
+                        console.warn('Autoplay prevented:', e);
+                        resolve();
+                    });
+            };
+        });
+        
+        console.log('Camera initialized successfully');
     } catch (err) {
         console.error('Error accessing camera:', err);
-        alert('Unable to access camera. Please make sure you have granted camera permissions.');
+        let errorMessage = 'Unable to access camera. ';
+        
+        if (err.name === 'NotAllowedError') {
+            errorMessage += 'Please allow camera access in your browser settings.';
+        } else if (err.name === 'NotFoundError') {
+            errorMessage += 'No camera found. Please make sure your device has a camera.';
+        } else if (err.name === 'NotReadableError') {
+            errorMessage += 'Camera is already in use by another application.';
+        } else if (err.name === 'OverconstrainedError') {
+            errorMessage += 'Camera does not meet the required constraints.';
+        } else {
+            errorMessage += err.message;
+        }
+        
+        alert(errorMessage);
+        
+        // Show a placeholder or fallback UI
+        if (cameraPreview) {
+            cameraPreview.style.display = 'none';
+        }
+        if (capturedPhoto) {
+            capturedPhoto.src = 'assets/placeholder.png';
+            capturedPhoto.style.display = 'block';
+        }
+        if (takePhotoBtn) {
+            takePhotoBtn.disabled = true;
+        }
     }
 }
 
 function takePhoto() {
-    const context = photoCanvas.getContext('2d');
-    photoCanvas.width = cameraPreview.videoWidth;
-    photoCanvas.height = cameraPreview.videoHeight;
-    context.drawImage(cameraPreview, 0, 0, photoCanvas.width, photoCanvas.height);
-    
-    state.customerPhoto = photoCanvas.toDataURL('image/png');
-    capturedPhoto.src = state.customerPhoto;
-    
-    // Show confirmation
-    cameraPreview.style.display = 'none';
-    capturedPhoto.style.display = 'block';
-    takePhotoBtn.style.display = 'none';
-    retakePhotoBtn.style.display = 'inline-block';
-    photoConfirmation.style.display = 'block';
+    try {
+        if (!cameraPreview || !cameraPreview.videoWidth) {
+            throw new Error('Camera is not ready yet');
+        }
+        
+        // Create canvas if it doesn't exist
+        if (!photoCanvas) {
+            photoCanvas = document.createElement('canvas');
+            photoCanvas.style.display = 'none';
+            document.body.appendChild(photoCanvas);
+        }
+        
+        const context = photoCanvas.getContext('2d');
+        photoCanvas.width = cameraPreview.videoWidth;
+        photoCanvas.height = cameraPreview.videoHeight;
+        context.drawImage(cameraPreview, 0, 0, photoCanvas.width, photoCanvas.height);
+        
+        // Save photo and update UI
+        state.customerPhoto = photoCanvas.toDataURL('image/png');
+        
+        // Update all photo elements
+        if (capturedPhoto) {
+            capturedPhoto.src = state.customerPhoto;
+            capturedPhoto.style.display = 'block';
+        }
+        
+        // Hide camera preview and show confirmation
+        if (cameraPreview) {
+            cameraPreview.style.display = 'none';
+        }
+        if (takePhotoBtn) {
+            takePhotoBtn.style.display = 'none';
+        }
+        if (retakePhotoBtn) {
+            retakePhotoBtn.style.display = 'inline-block';
+        }
+        if (photoConfirmation) {
+            photoConfirmation.style.display = 'block';
+        }
+        
+    } catch (err) {
+        console.error('Error taking photo:', err);
+        alert('Unable to take photo. ' + err.message);
+    }
 }
 
 function retakePhoto() {
@@ -736,7 +851,7 @@ function showReceipt() {
                 itemDescription += ` with ${item.options.milk}`;
             }
             
-            if (item.options.extras && item.options.extras.length > 0) {
+            if (item.options.extras.length > 0) {
                 itemDescription += ` + ${item.options.extras.join(', ')}`;
             }
         } else if (item.type === 'drink' && item.options) {
@@ -889,6 +1004,11 @@ function clearDrawing() {
 }
 
 function showTipDrawing() {
+    // Hide the order summary and header
+    document.querySelector('#checkout-items').style.display = 'none';
+    document.querySelector('.checkout-summary').style.display = 'none';
+    document.querySelector('#checkout-screen h2').style.display = 'none';
+    
     addTipBtn.style.display = 'none';
     tipContainer.style.display = 'block';
     console.log('Showing tip drawing container');
@@ -921,10 +1041,12 @@ function showTipDrawing() {
             drawingCanvas.style.width = canvasWidth + 'px';
             drawingCanvas.style.height = canvasHeight + 'px';
             
-            // Restore the drawing
-            window.signaturePad.fromData(data || []);
+            // Restore the drawing if there was one
+            if (data) {
+                window.signaturePad.fromData(data);
+            }
         }
-    }, 100);
+    }, 0);
 }
 
 // Order confirmation

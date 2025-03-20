@@ -1107,10 +1107,14 @@ button {
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 0.5rem;
+    text-align: center;
 }
 
 .header-left {
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .header-left h3 {
@@ -1129,6 +1133,7 @@ button {
     width: 32px;
     height: 32px;
     margin-left: 0.5rem;
+    flex-shrink: 0;
 }
 
 .receipt-customer {
@@ -1241,7 +1246,8 @@ button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #f9f9f9;
+    background: #ffffff;
+    border: 1px solid #eee;
     border-radius: 4px;
     padding: 0.25rem;
 }
