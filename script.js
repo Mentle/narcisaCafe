@@ -53,7 +53,6 @@ let receiptItemsList;
 let receiptDoodle;
 let downloadReceiptBtn;
 let newOrderBtn;
-let authorizeButton;
 
 // New elements for improved navigation
 let tabButtons;
@@ -79,11 +78,10 @@ let lastX = 0;
 let lastY = 0;
 let currentColor = '#000000'; // Default drawing color
 
-import { GOOGLE_CONFIG } from './config.js';
-
-let tokenClient;
-let gapiInited = false;
-let gisInited = false;
+// Initialize Supabase client
+const supabaseUrl = 'https://nfpmzhssbyzshvbnmjhq.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5mcG16aHNzYnl6c2h2Ym5tamhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0NzYxODUsImV4cCI6MjA1ODA1MjE4NX0.iskxliuv4ecn55MVHzjsC4MXHuuS5WzjiTamUQz3S2w';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', initialize);
@@ -124,7 +122,6 @@ function initialize() {
     receiptDoodle = document.getElementById('receipt-doodle');
     downloadReceiptBtn = document.getElementById('download-receipt-btn');
     newOrderBtn = document.getElementById('new-order-btn');
-    authorizeButton = document.getElementById('authorize_button');
     
     // New elements for improved navigation
     tabButtons = document.querySelectorAll('.tab-btn');
@@ -248,7 +245,6 @@ function initialize() {
     confirmOrderBtn.addEventListener('click', confirmOrder);
     downloadReceiptBtn.addEventListener('click', downloadReceipt);
     newOrderBtn.addEventListener('click', startNewOrder);
-    authorizeButton.addEventListener('click', handleAuthClick);
     
     // Initialize camera
     initializeCamera();
@@ -270,10 +266,6 @@ function initialize() {
     if (drinkCustomization) {
         drinkCustomization.style.display = 'none';
     }
-    
-    // Initialize Google APIs
-    initializeGoogleAPI();
-    initializeGIS();
 }
 
 // Navigation
@@ -882,7 +874,40 @@ function showCheckout() {
     checkoutTotal.textContent = `€${grandTotal.toFixed(2)}`;
 }
 
-// Show receipt screen
+// Auto-save receipt to Supabase
+async function autoSaveReceipt() {
+    try {
+        // Convert receipt to image
+        const receipt = document.getElementById('receipt');
+        const canvas = await html2canvas(receipt, {
+            scale: 2,
+            backgroundColor: '#FFFFFF',
+            logging: false
+        });
+        
+        // Convert canvas to blob
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+        
+        // Create filename with date and order number
+        const filename = `Receipt_${state.orderNumber}_${new Date().toISOString().split('T')[0]}.jpg`;
+        
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+            .from('receipts')
+            .upload(filename, blob, {
+                contentType: 'image/jpeg',
+                upsert: true
+            });
+            
+        if (error) throw error;
+        console.log('Receipt saved successfully to Supabase');
+        
+    } catch (err) {
+        console.error('Error saving receipt:', err);
+    }
+}
+
+// Show receipt and auto-save
 function showReceipt() {
     // Generate a random order number
     const orderNumber = Math.floor(10000 + Math.random() * 90000);
@@ -890,80 +915,100 @@ function showReceipt() {
     
     // Get current date and time with Spanish locale
     const now = new Date();
-    const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-    const timeOptions = { hour: '2-digit', minute: '2-digit' };
-    const dateString = now.toLocaleDateString('es-ES', dateOptions);
-    const timeString = now.toLocaleTimeString('es-ES', timeOptions);
+    const dateStr = now.toLocaleDateString('es-ES', { 
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+    }).toLowerCase();
     
-    // Calculate subtotal, tax, and total
-    let subtotal = 0;
-    state.cart.forEach(item => {
-        subtotal += item.price;
+    const timeStr = now.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
     });
     
-    const tax = subtotal * 0.10; // 10% IVA (Spanish VAT)
+    // Calculate totals
+    const subtotal = state.cart.reduce((sum, item) => sum + item.price, 0);
+    const tax = subtotal * 0.10; // 10% IVA
     const total = subtotal + tax;
     
-    // Generate random card last 4 digits
-    const cardLast4 = Math.floor(1000 + Math.random() * 9000);
+    // Format currency
+    const formatCurrency = (amount) => {
+        return '€' + amount.toFixed(2);
+    };
     
-    // Populate receipt fields
-    document.getElementById('receipt-order-number').textContent = orderNumber;
-    document.getElementById('receipt-date').textContent = dateString;
-    document.getElementById('receipt-time').textContent = timeString;
-    document.getElementById('receipt-subtotal').textContent = `€${subtotal.toFixed(2)}`;
-    document.getElementById('receipt-tax').textContent = `€${tax.toFixed(2)}`;
-    document.getElementById('receipt-total').textContent = `€${total.toFixed(2)}`;
-    document.getElementById('receipt-card-last4').textContent = cardLast4;
+    // Generate receipt HTML
+    const receipt = document.getElementById('receipt');
+    if (!receipt) return;
     
-    // Populate customer info and items
-    receiptPhoto.src = state.customerPhoto || 'assets/placeholder.png';
-    receiptName.textContent = `Customer: ${state.customerName}`;
-    
-    // Clear previous items
-    receiptItemsList.innerHTML = '';
-    
-    // Add items to receipt
-    state.cart.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.className = 'receipt-item';
+    receipt.innerHTML = `
+        <div class="receipt-header">
+            <div class="header-left">
+                <h3>Narcisa Mimosa Café</h3>
+                <p class="receipt-address">El Borne, Barcelona</p>
+            </div>
+            <img src="assets/logo.png" alt="Logo" class="receipt-logo">
+        </div>
         
-        let itemDescription = item.name;
-        if (item.type === 'coffee' && item.options) {
-            if (item.options.milk) {
-                itemDescription += ` with ${item.options.milk}`;
-            }
-            
-            if (item.options.extras.length > 0) {
-                itemDescription += ` + ${item.options.extras.join(', ')}`;
-            }
-        } else if (item.type === 'drink' && item.options) {
-            if (item.options.ice) {
-                itemDescription += ` with ${item.options.ice}`;
-            }
-            
-            if (item.options.sweetness) {
-                itemDescription += `, ${item.options.sweetness}`;
-            }
-        }
+        <div class="receipt-customer">
+            <div class="photo-container">
+                <img src="${state.customerPhoto || 'assets/placeholder.png'}" alt="Customer" id="receipt-photo">
+            </div>
+            <p id="receipt-name">Customer: ${state.customerName || 'Guest'}</p>
+        </div>
         
-        itemElement.innerHTML = `
-            <div>${itemDescription}</div>
-            <div>€${item.price.toFixed(2)}</div>
-        `;
+        <div class="receipt-details">
+            <div class="receipt-row">
+                <span>Order #${orderNumber}</span>
+                <span>${dateStr}</span>
+                <span>Server: Amanda</span>
+                <span>${timeStr}</span>
+            </div>
+        </div>
         
-        receiptItemsList.appendChild(itemElement);
-    });
+        <div class="receipt-items">
+            ${state.cart.map(item => `
+                <div class="receipt-row">
+                    <span>${item.name}${item.customizations ? ' with ' + item.customizations : ''}</span>
+                    <span>${formatCurrency(item.price)}</span>
+                </div>
+            `).join('')}
+        </div>
+        
+        <div class="receipt-totals">
+            <div class="receipt-row">
+                <span>Subtotal:</span>
+                <span>${formatCurrency(subtotal)}</span>
+            </div>
+            <div class="receipt-row">
+                <span>Tax (10% IVA):</span>
+                <span>${formatCurrency(tax)}</span>
+            </div>
+            <div class="receipt-row total">
+                <span>Total:</span>
+                <span>${formatCurrency(total)}</span>
+            </div>
+        </div>
+        
+        <div class="receipt-payment">
+            <p>Card **** **** **** ${Math.floor(1000 + Math.random() * 9000)}</p>
+        </div>
+        
+        <div class="receipt-message">
+            <p>Your Message:</p>
+            <div class="doodle-container">
+                <img src="${state.doodle}" alt="Customer doodle" id="receipt-doodle">
+            </div>
+        </div>
+    `;
     
-    // Set doodle image
-    if (state.doodle) {
-        receiptDoodle.src = state.doodle;
-        receiptDoodle.style.display = 'block';
-    } else {
-        receiptDoodle.style.display = 'none';
-    }
+    // Navigate to receipt screen
+    navigateTo('receipt-screen');
     
-    // Note: Navigation to receipt-screen is now handled in confirmOrder()
+    // Wait a moment for the receipt to render completely
+    setTimeout(() => {
+        autoSaveReceipt();
+    }, 500);
 }
 
 // Drawing functions
@@ -1142,9 +1187,6 @@ function confirmOrder() {
     
     // Navigate to receipt screen
     navigateTo('receipt-screen');
-    
-    // Upload receipt to Google Drive
-    handleAuthClick();
 }
 
 // Receipt download
@@ -1306,100 +1348,4 @@ function createAssetsDirectory() {
     // This is just a placeholder function since we can't create directories from JavaScript
     // In a real implementation, the assets directory would be created on the server
     console.log('Assets directory should be created on the server');
-}
-
-// Initialize Google API
-function initializeGoogleAPI() {
-    gapi.load('client', async () => {
-        try {
-            await gapi.client.init({
-                apiKey: GOOGLE_CONFIG.API_KEY,
-                discoveryDocs: [GOOGLE_CONFIG.DISCOVERY_DOC],
-            });
-            gapiInited = true;
-            maybeEnableButtons();
-        } catch (err) {
-            console.error('Error initializing GAPI client:', err);
-        }
-    });
-}
-
-// Initialize Google Identity Services
-function initializeGIS() {
-    tokenClient = google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CONFIG.CLIENT_ID,
-        scope: GOOGLE_CONFIG.SCOPES,
-        callback: '', // Will be set later
-    });
-    gisInited = true;
-    maybeEnableButtons();
-}
-
-function maybeEnableButtons() {
-    if (gapiInited && gisInited) {
-        document.getElementById('authorize_button')?.classList.remove('hidden');
-    }
-}
-
-// Handle authorization
-async function handleAuthClick() {
-    tokenClient.callback = async (resp) => {
-        if (resp.error !== undefined) {
-            throw resp;
-        }
-        await uploadReceiptToDrive();
-    };
-
-    if (gapi.client.getToken() === null) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-        tokenClient.requestAccessToken({ prompt: '' });
-    }
-}
-
-// Upload receipt to Google Drive
-async function uploadReceiptToDrive() {
-    try {
-        // Convert receipt to image
-        const receipt = document.getElementById('receipt');
-        const canvas = await html2canvas(receipt, {
-            scale: 2,
-            backgroundColor: '#FFFFFF',
-            logging: false
-        });
-        
-        // Convert canvas to blob
-        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
-        
-        // Create file metadata
-        const filename = `Receipt_${state.orderNumber}_${new Date().toISOString().split('T')[0]}.jpg`;
-        const metadata = {
-            name: filename,
-            mimeType: 'image/jpeg',
-            parents: [GOOGLE_CONFIG.TARGET_FOLDER_ID]
-        };
-        
-        // Create multipart request
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', blob);
-        
-        // Upload file
-        const upload = await gapi.client.request({
-            path: '/upload/drive/v3/files',
-            method: 'POST',
-            params: { uploadType: 'multipart' },
-            headers: {
-                'Content-Type': 'multipart/form-data; boundary=receipt_upload'
-            },
-            body: form
-        });
-        
-        console.log('Receipt uploaded successfully:', upload.result);
-        alert('Receipt has been saved to Google Drive');
-        
-    } catch (err) {
-        console.error('Error uploading to Drive:', err);
-        alert('Failed to upload receipt to Google Drive. Please try again.');
-    }
 }
