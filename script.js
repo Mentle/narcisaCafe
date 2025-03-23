@@ -19,6 +19,43 @@ const state = {
     orderNumber: null
 };
 
+// Price map for all menu items
+const PRICES = {
+    // Coffee
+    'Espresso': 2.50,
+    'Dirty Chai': 3.50,
+    'Cortado': 3.00,
+    'Americano': 3.00,
+    'Double Espresso': 3.50,
+    'Café con leche': 3.50,
+    'Latte': 3.80,
+    'Cappuccino': 3.80,
+    'Flat white': 3.80,
+    'Latte Macchiato': 3.80,
+    'Ice Latte': 4.00,
+    'Cold Brew': 4.00,
+    // Sweet
+    'New York Cookies': 2.50,
+    'Lemon Bites': 3.20,
+    'Carrot Bites': 3.50,
+    'English Tea Cheesecake': 4.50,
+    'Brownies Fudge': 3.80,
+    'Apple Bites': 3.50,
+    'Croissant de Almendras': 3.80,
+    'Mini Rolls': 3.20,
+    'Banana Choco': 3.50,
+    // Salty
+    'Bocata ibérico': 6.50,
+    'Ricotta Verde': 5.50,
+    'Bagel Nordico': 6.00,
+    'Bagel Huerta': 5.50,
+    'Bikini Tostado': 4.50,
+    'Mini Caprese': 4.50,
+    'Pizzetas Verdes': 5.00,
+    'Croissants J&Q': 4.50,
+    'Tequeñitos': 4.00
+};
+
 // DOM elements - will be initialized in the initialize function
 let screens;
 let beginOrderBtn;
@@ -545,7 +582,7 @@ function confirmIdentity() {
 function selectMenuItem(item) {
     const itemType = item.dataset.type;
     const itemName = item.dataset.item;
-    const itemPrice = parseFloat(item.dataset.price);
+    const itemPrice = PRICES[itemName] || 0;
     
     if (itemType === 'pastry' || itemType === 'salty') {
         // Toggle selection for pastries and salty items
@@ -1357,30 +1394,3 @@ function createAssetsDirectory() {
     // In a real implementation, the assets directory would be created on the server
     console.log('Assets directory should be created on the server');
 }
-
-const menu = {
-    coffee: [
-        { id: 'espresso', name: 'Espresso', price: 899.99, image: 'assets/espresso.jpg', customizations: ['Extra Shot', 'Iced'] },
-        { id: 'cappuccino', name: 'Cappuccino', price: 1299.99, image: 'assets/cappuccino.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk'] },
-        { id: 'latte', name: 'Latte', price: 1499.99, image: 'assets/latte.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk', 'Vanilla', 'Caramel'] },
-        { id: 'americano', name: 'Americano', price: 749.99, image: 'assets/americano.jpg', customizations: ['Extra Shot', 'Iced'] },
-        { id: 'mocha', name: 'Mocha', price: 1699.99, image: 'assets/mocha.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk', 'Extra Chocolate'] },
-        { id: 'flatWhite', name: 'Flat White', price: 1399.99, image: 'assets/flat-white.jpg', customizations: ['Extra Shot', 'Oat Milk', 'Soy Milk', 'Almond Milk'] }
-    ],
-    food: [
-        { id: 'croissant', name: 'Croissant', price: 499.99, image: 'assets/croissant.jpg' },
-        { id: 'muffin', name: 'Muffin', price: 599.99, image: 'assets/muffin.jpg' },
-        { id: 'sandwich', name: 'Sandwich', price: 2499.99, image: 'assets/sandwich.jpg' },
-        { id: 'cake', name: 'Cake Slice', price: 1999.99, image: 'assets/cake.jpg' }
-    ],
-    customizations: {
-        'Extra Shot': 299.99,
-        'Oat Milk': 399.99,
-        'Soy Milk': 399.99,
-        'Almond Milk': 399.99,
-        'Vanilla': 299.99,
-        'Caramel': 299.99,
-        'Extra Chocolate': 499.99,
-        'Iced': 199.99
-    }
-};

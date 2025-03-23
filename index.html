@@ -6,7 +6,7 @@
     <title>Narcisa Mimosa Coffee Shop</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paper.js/0.12.17/paper-full.min.js"></script>
 </head>
@@ -67,68 +67,114 @@
             
             <div class="menu-container">
                 <div id="drinks-section" class="menu-section tab-content active">
-                    <h3>Drinks</h3>
-                    
-                    <h4 class="subsection-title">Coffee</h4>
+                    <h3>Coffee</h3>
                     <div class="coffee-grid">
-                        <div class="menu-item" data-item="Espresso" data-type="coffee" data-price="2.50">
-                            <img src="assets/espresso.jpg" alt="Espresso">
+                        <div class="menu-item" data-item="Espresso" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
                             <div class="menu-item-details">
                                 <h4>Espresso</h4>
-                                <p class="price">€2.50</p>
+                                <p class="description">1 SHOT DE CAFÉ</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Cappuccino" data-type="coffee" data-price="3.50">
-                            <img src="assets/cappuccino.jpg" alt="Cappuccino">
+                        <div class="menu-item" data-item="Dirty Chai" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-saucer"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Cappuccino</h4>
-                                <p class="price">€3.50</p>
+                                <h4>Dirty Chai</h4>
+                                <p class="description">1 SHOT DE CAFÉ + CHAI</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Latte" data-type="coffee" data-price="3.80">
-                            <img src="assets/latte.jpg" alt="Latte">
+                        <div class="menu-item" data-item="Cortado" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Latte</h4>
-                                <p class="price">€3.80</p>
+                                <h4>Cortado</h4>
+                                <p class="description">1 SHOT DE CAFÈ + 100 ML DE LECHE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Americano" data-type="coffee" data-price="3.00">
-                            <img src="assets/americano.jpg" alt="Americano">
+                        <div class="menu-item" data-item="Americano" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
                             <div class="menu-item-details">
                                 <h4>Americano</h4>
-                                <p class="price">€3.00</p>
+                                <p class="description">2 SHOTS DE CAFÉ + 100 ML DE AGUA</p>
                             </div>
                         </div>
-                    </div>
-                    
-                    <h4 class="subsection-title">Other Drinks</h4>
-                    <div class="drinks-grid">
-                        <div class="menu-item" data-item="Orange Juice" data-type="drink" data-price="3.50">
-                            <img src="assets/orange-juice.jpg" alt="Orange Juice">
+                        <div class="menu-item" data-item="Double Espresso" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Orange Juice</h4>
-                                <p class="price">€3.50</p>
+                                <h4>Double Espresso</h4>
+                                <p class="description">2 SHOTS DE CAFÉ</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Chai" data-type="drink" data-price="3.20">
-                            <img src="assets/chai.jpg" alt="Chai">
+                        <div class="menu-item" data-item="Café con leche" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Chai</h4>
-                                <p class="price">€3.20</p>
+                                <h4>Café con leche</h4>
+                                <p class="description">1 SHOT DE CAFÉ + 150 ML LECHE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="CacaoLat" data-type="drink" data-price="3.00">
-                            <img src="assets/cacaolat.jpg" alt="CacaoLat">
+                        <div class="menu-item" data-item="Latte" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>CacaoLat</h4>
-                                <p class="price">€3.00</p>
+                                <h4>Latte</h4>
+                                <p class="description">1 SHOT DE CAFÉ + 220 ML LECHE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Lemonade" data-type="drink" data-price="2.80">
-                            <img src="assets/lemonade.jpg" alt="Lemonade">
+                        <div class="menu-item" data-item="Cappuccino" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Lemonade</h4>
-                                <p class="price">€2.80</p>
+                                <h4>Cappuccino</h4>
+                                <p class="description">2 SHOTS DE CAFÉ + 110 ML LECHE</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Flat white" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
+                            <div class="menu-item-details">
+                                <h4>Flat white</h4>
+                                <p class="description">1 SHOT DE CAFÉ + 350 ML LECHE</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Latte Macchiato" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <div class="menu-item-details">
+                                <h4>Latte Macchiato</h4>
+                                <p class="description">1 SHOT DE CAFÉ + 350 ML LECHE</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Ice Latte" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-mug-hot"></i>
+                            </div>
+                            <div class="menu-item-details">
+                                <h4>Ice Latte</h4>
+                                <p class="description">2 SHOTS DE CAFÉ + 300 ML LECHE</p>
+                            </div>
+                        </div>
+                        <div class="menu-item" data-item="Cold Brew" data-type="coffee">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-coffee"></i>
+                            </div>
+                            <div class="menu-item-details">
+                                <h4>Cold Brew</h4>
+                                <p class="description">CAFÉ TOSTADO INFUSIONADO EN FRÍO</p>
                             </div>
                         </div>
                     </div>
@@ -137,136 +183,172 @@
                 <div id="sweet-section" class="menu-section tab-content">
                     <h3>Sweet</h3>
                     <div class="pastry-grid">
-                        <div class="menu-item" data-item="New York Cookies" data-type="pastry" data-price="2.50">
-                            <img src="assets/cookies.jpg" alt="New York Cookies">
+                        <div class="menu-item" data-item="New York Cookies" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-cookie"></i>
+                            </div>
                             <div class="menu-item-details">
                                 <h4>New York Cookies</h4>
-                                <p class="price">€2.50</p>
+                                <p class="description">GALLETA SIN GLUTEN, SUAVE, CHOCOLATE, MANTEQUILLA, VAINILLA</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Pie de Limon" data-type="pastry" data-price="3.20">
-                            <img src="assets/pie-limon.jpg" alt="Pie de Limon">
+                        <div class="menu-item" data-item="Lemon Bites" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-lemon"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Pie de Limon</h4>
-                                <p class="price">€3.20</p>
+                                <h4>Lemon Bites</h4>
+                                <p class="description">PIE DE LIMÓN, BASE CRUJIENTE SIN GLUTEN, CREMOSO, MERENGUE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Carrot Cake" data-type="pastry" data-price="3.50">
-                            <img src="assets/carrot-cake.jpg" alt="Carrot Cake">
+                        <div class="menu-item" data-item="Carrot Bites" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-carrot"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Carrot Cake</h4>
-                                <p class="price">€3.50</p>
+                                <h4>Carrot Bites</h4>
+                                <p class="description">PASTEL ZANAHORIA SIN GLUTEN, NUECES, CANELA, CREMA</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Mini Cheesecake" data-type="pastry" data-price="3.80">
-                            <img src="assets/cheesecake.jpg" alt="Mini Cheesecake">
+                        <div class="menu-item" data-item="English Tea Cheesecake" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-cake-candles"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Mini Cheesecake</h4>
-                                <p class="price">€3.80</p>
+                                <h4>English Tea Cheesecake</h4>
+                                <p class="description">CHEESECAKE SUAVE, INFUSIONADO EN TÉ, GALLETA SIN GLUTEN, CREMOSO</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Brownies" data-type="pastry" data-price="2.80">
-                            <img src="assets/brownies.jpg" alt="Brownies">
+                        <div class="menu-item" data-item="Brownies Fudge" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-brownies"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Brownies</h4>
-                                <p class="price">€2.80</p>
+                                <h4>Brownies Fudge</h4>
+                                <p class="description">CHOCOLATE INTENSO, SUAVE, HUMEDO, DENSO, SIN GLUTEN</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Apple Cake" data-type="pastry" data-price="3.30">
-                            <img src="assets/apple-cake.jpg" alt="Apple Cake">
+                        <div class="menu-item" data-item="Apple Bites" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-apple"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Apple Cake</h4>
-                                <p class="price">€3.30</p>
+                                <h4>Apple Bites</h4>
+                                <p class="description">MANZANA, CANELA, MASA SUAVE, HORNEADO, SIN GLUTEN</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Croissant de Almendras" data-type="pastry" data-price="2.80">
-                            <img src="assets/croissant.jpg" alt="Croissant de Almendras">
+                        <div class="menu-item" data-item="Croissant de Almendras" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-croissant"></i>
+                            </div>
                             <div class="menu-item-details">
                                 <h4>Croissant de Almendras</h4>
-                                <p class="price">€2.80</p>
+                                <p class="description">HOJALDRE SIN GLUTEN, ALMENDRAS, CREMA, AZÚCAR GLAS</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Cinnamon Rolls" data-type="pastry" data-price="3.20">
-                            <img src="assets/cinnamon-roll.jpg" alt="Cinnamon Rolls">
+                        <div class="menu-item" data-item="Mini Rolls" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-roll"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Cinnamon Rolls</h4>
-                                <p class="price">€3.20</p>
+                                <h4>Mini Rolls</h4>
+                                <p class="description">MASA SUAVE SIN GLUTEN, CANELA, GLASEADO, MANTEQUILLA</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Banana Chocolate Chips Cake" data-type="pastry" data-price="3.40">
-                            <img src="assets/banana-cake.jpg" alt="Banana Chocolate Chips Cake">
+                        <div class="menu-item" data-item="Banana Choco" data-type="pastry">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-banana"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Banana Chocolate Chips Cake</h4>
-                                <p class="price">€3.40</p>
+                                <h4>Banana Choco</h4>
+                                <p class="description">PLÁTANO, CHOCOLATE, BIZCOCHO SIN GLUTEN, SUAVE, DULCE</p>
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <div id="salty-section" class="menu-section tab-content">
                     <h3>Salty</h3>
                     <div class="salty-grid">
-                        <div class="menu-item" data-item="Pan Jamon Iberico" data-type="salty" data-price="4.50">
-                            <img src="assets/pan-jamon.jpg" alt="Pan Jamon Iberico">
+                        <div class="menu-item" data-item="Bocata ibérico" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-sandwich"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Pan Jamon Iberico</h4>
-                                <p class="price">€4.50</p>
+                                <h4>Bocata ibérico</h4>
+                                <p class="description">JAMÓN IBÉRICO, PAN CRUJIENTE, TOMATE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Ricota & Espinaca Bites" data-type="salty" data-price="3.80">
-                            <img src="assets/ricota-espinaca.jpg" alt="Ricota & Espinaca Bites">
+                        <div class="menu-item" data-item="Ricotta Verde" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Ricota & Espinaca Bites</h4>
-                                <p class="price">€3.80</p>
+                                <h4>Ricotta Verde</h4>
+                                <p class="description">RICOTTA, PESTO, ESPINACA, HOJALDRE SIN GLUTEN</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Bagel de Queso y Salmon" data-type="salty" data-price="4.80">
-                            <img src="assets/bagel-salmon.jpg" alt="Bagel de Queso y Salmon">
+                        <div class="menu-item" data-item="Bagel Nordico" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-bagel"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Bagel de Queso y Salmon</h4>
-                                <p class="price">€4.80</p>
+                                <h4>Bagel Nordico</h4>
+                                <p class="description">SALMÓN, QUESO CREMA, ENELDO, BAGEL</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Bagel Vegetales" data-type="salty" data-price="4.20">
-                            <img src="assets/bagel-vegetales.jpg" alt="Bagel Vegetales">
+                        <div class="menu-item" data-item="Bagel Huerta" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-bagel"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Bagel Vegetales</h4>
-                                <p class="price">€4.20</p>
+                                <h4>Bagel Huerta</h4>
+                                <p class="description">MIX VEGETALES, QUESO CREMA</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Bikini" data-type="salty" data-price="3.50">
-                            <img src="assets/bikini.jpg" alt="Bikini">
+                        <div class="menu-item" data-item="Bikini Tostado" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-toaster"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Bikini</h4>
-                                <p class="price">€3.50</p>
+                                <h4>Bikini Tostado</h4>
+                                <p class="description">JAMÓN, QUESO FUNDIDO, PAN DE MOLDE</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Mini Capressa" data-type="salty" data-price="4.00">
-                            <img src="assets/capressa.jpg" alt="Mini Capressa">
+                        <div class="menu-item" data-item="Mini Caprese" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-tomato"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Mini Capressa</h4>
-                                <p class="price">€4.00</p>
+                                <h4>Mini Caprese</h4>
+                                <p class="description">BRUSCHETTA MOZZARELLA, TOMATE, ALBAHACA, PESTO</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Mini Pizzas" data-type="salty" data-price="3.80">
-                            <img src="assets/mini-pizza.jpg" alt="Mini Pizzas">
+                        <div class="menu-item" data-item="Pizzetas Verdes" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-pizza-slice"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Mini Pizzas</h4>
-                                <p class="price">€3.80</p>
+                                <h4>Pizzetas Verdes</h4>
+                                <p class="description">ESPINACA, RICOTTA, CHAMPIÑONES, MASA FINA SIN GLUTEN, PARMESANO</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Croissant de Jamon y Queso" data-type="salty" data-price="3.90">
-                            <img src="assets/croissant-jamon.jpg" alt="Croissant de Jamon y Queso">
+                        <div class="menu-item" data-item="Croissants J&Q" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-croissant"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Croissant de Jamon y Queso</h4>
-                                <p class="price">€3.90</p>
+                                <h4>Croissants J&Q</h4>
+                                <p class="description">JAMÓN, QUESO, HOJALDRE SIN GLUTEN, MANTEQUILLA</p>
                             </div>
                         </div>
-                        <div class="menu-item" data-item="Tequeños" data-type="salty" data-price="3.60">
-                            <img src="assets/tequenos.jpg" alt="Tequeños">
+                        <div class="menu-item" data-item="Tequeñitos" data-type="salty">
+                            <div class="menu-item-icon">
+                                <i class="fas fa-cheese"></i>
+                            </div>
                             <div class="menu-item-details">
-                                <h4>Tequeños</h4>
-                                <p class="price">€3.60</p>
+                                <h4>Tequeñitos</h4>
+                                <p class="description">QUESO BLANCO, MASA CRUJIENTE, HORNEADOS</p>
                             </div>
                         </div>
                     </div>
